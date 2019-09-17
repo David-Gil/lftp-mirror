@@ -4,6 +4,8 @@
 """
    lftp_mirror.py: This script mirrors a remote FTP server dir with a local dir
 """
+from __future__ import print_function
+from __future__ import division
 
 #==============================================================================
 # This Script mirrors a remote FTP server dir with a local dir (or vice versa)
@@ -57,6 +59,12 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #==============================================================================
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from past.utils import old_div
+from builtins import object
 __author__ = "joe di castro - joe@joedicastro.com"
 __license__ = "GNU General Public License version 3"
 __date__ = "16/9/2012"
@@ -75,7 +83,7 @@ try:
     import smtplib
     import getpass
     from argparse import ArgumentParser, SUPPRESS
-    from ConfigParser import SafeConfigParser
+    from configparser import SafeConfigParser
     from subprocess import Popen, PIPE, STDOUT
     from email.mime.text import MIMEText
     from email.mime.multipart import MIMEMultipart
@@ -100,7 +108,7 @@ if os.getenv('DISPLAY', ''):
         NOT_NOTIFY = True
 
 
-class Logger():
+class Logger(object):
     """
 
     Create a log object to log script messages.
@@ -294,7 +302,7 @@ class Logger():
         (boolean) append -- If true appends log to file, else writes a new one
 
         """
-        mode = 'ab' if append else 'wb'
+        mode = 'at' if append else 'wt'
         with open(self.filename, mode) as log_file:
             log_file.write(self.__log)
 
@@ -543,7 +551,7 @@ def notify(msg, status):
     note.set_icon_from_pixbuf(icon)
     try:
         note.show()
-    except Exception, e:
+    except Exception as e:
         NOTIFY_ERRORS.append(e)
 
 
@@ -558,7 +566,7 @@ def best_unit_size(bytes_size):
 
     """
     for exp in range(0, 90, 10):
-        bu_size = abs(bytes_size) / pow(2.0, exp)
+        bu_size = old_div(abs(bytes_size), pow(2.0, exp))
         if int(bu_size) < 2 ** 10:
             unit = {0: 'bytes', 10: 'KiB', 20: 'MiB', 30: 'GiB', 40: 'TiB',
                     50: 'PiB', 60: 'EiB', 70: 'ZiB', 80: 'YiB'}[exp]
@@ -683,7 +691,7 @@ def parse_parms(*parms):
                          parms[2],
                          parms[3],
                          '-l {0}'.format(parms[4]) if parms[4] else '',
-                         base64.b64decode(parms[5]),
+                         base64.b64decode(parms[5]).decode('utf-8'),
                          parms[6]))
     return parameters.split()
 
